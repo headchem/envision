@@ -227,7 +227,7 @@ window.onload = function()
             
             var render = camera.get3DPosition(obj);
 
-
+            // TODO: this alpha isn't working yet
 
             // alpha fades to 0 as it approaches the camera within 700 z
             //var alphaFactor = ((render.viewZ) / 700);
@@ -237,7 +237,7 @@ window.onload = function()
 	            //alphaFactor = alphaFactor * alphaFactor;
 	            //alpha = alpha * alphaFactor;// + 1;
             //}
-            
+
             canvas.fillStyle = 'rgba(' + color.r + ',' + color.g + ',' + color.b + ', ' + alpha + ')';
             
             if (alpha > 0.01 && render.viewZ <= 0 && render.imgLeft > 0 && render.imgLeft + render.imgW < camera.stageW && render.imgTop - render.imgH > 0 && render.imgTop + render.imgH < camera.stageH) // view culling
