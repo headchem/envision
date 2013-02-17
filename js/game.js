@@ -26,7 +26,7 @@ window.onload = function()
     var camDim = JD.EntityState.Dimension.create(50,50,50);
 
     camPos.has(JD.Behaviors.WASD.create(50, true));
- 
+
     var camera = JD.Core.Camera.create(camPos, camDim);
     var performance = JD.Core.Performance.create(60);
 
@@ -56,11 +56,18 @@ window.onload = function()
     var canvas = canvasEl.getContext("2d");
     var trees = []; // this should change to an array of all drawable (has Position and Dimension) entities?
 
-    //trees.push(makeSimpleParticle(100,100,1000,1000,1000,1000, false));
+    trees.push(makeMainCharacter());
 
-    for(var i=0; i < 25; i++)
+    trees.push(makeSimpleParticle(1500,0,1000,500,100,100, false));
+    trees.push(makeSimpleParticle(-1500,0,5000,500,500,500, false));
+    trees.push(makeSimpleParticle(-5000,0,200,1000,500,500, false));
+    trees.push(makeSimpleParticle(3000,0,-1000,300,200,100, false));
+    trees.push(makeSimpleParticle(4000,0,3000,300,200,100, false));
+    trees.push(makeSimpleParticle(-3000,0,0,300,200,100, false));
+
+    for(var i=0; i < 45; i++)
     {
-        var areaW = 10000;
+        var areaW = 20000;
         var areaH = 10000;
         var areaD = 10000;
 
@@ -171,9 +178,18 @@ window.onload = function()
     {
         var pPos = JD.EntityState.Position.create(x, y, z);
         var pDim = JD.EntityState.Dimension.create(w,h,0);
-        var pColor = JD.EntityState.Color.create(255, 128, 128, 1.0);
+        var pColor = JD.EntityState.Color.create(parseInt(Math.random() * 255), parseInt(Math.random() * 255), parseInt(Math.random() * 255), 1.0);
 
         return JD.GameObjects.SingleParticle.create(pPos, pDim, pColor);
+    }
+
+    function makeMainCharacter()
+    {
+        var charPos = JD.EntityState.Position.create(0,0,6000);
+        var charDim = JD.EntityState.Dimension.create(200,500,200);
+        var charColor = JD.EntityState.Color.create(255, 50, 50, 1.0, true);
+
+        return JD.GameObjects.MainCharacter.create(charPos, charDim, charColor);
     }
 
     function makeBox(name, x,y,z, w,h,d, isWanderer, isWindDrift, isExpander, isLeft, isWASD, attachCollide)
@@ -251,7 +267,7 @@ window.onload = function()
 
             // now fade out particles in the line of sight to the character in the center
 
-            if (render.viewZ > centerUpperBound)// || render.viewZ < centerLowerBound)
+            if (color.isFixedOpacity == false && render.viewZ > centerUpperBound)// || render.viewZ < centerLowerBound)
             {
                 var centerMod = Math.abs(render.viewZ - (centerDepth)) / centerFalloff;
 

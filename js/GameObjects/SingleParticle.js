@@ -12,7 +12,7 @@ JD.GameObjects.SingleParticle = JD.Core.Component.extend(null, {
 
                 var pPos = JD.EntityState.Position.create(position.x, position.y, position.z);
                 var pDim = JD.EntityState.Dimension.create(dimension.w,dimension.h,0);
-                var pColor = JD.EntityState.Color.create(color.r, color.g, color.b, color.a);
+                var pColor = JD.EntityState.Color.create(color.r, color.g, color.b, color.a, true);
 
                 var p = JD.GameObjects.Particle.create(pPos, pDim, pColor);
 
