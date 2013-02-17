@@ -22,11 +22,11 @@ window.onload = function()
     var screenW = 0;
     var screenH = 0;
 
-    var camPos = JD.EntityState.Position.create(0,0,0);
+    var camPos = JD.EntityState.Position.create(0,-3900,0);
     var camDim = JD.EntityState.Dimension.create(50,50,50);
 
     camPos.has(JD.Behaviors.WASD.create(50, true));
-
+ 
     var camera = JD.Core.Camera.create(camPos, camDim);
     var performance = JD.Core.Performance.create(60);
 
@@ -55,19 +55,14 @@ window.onload = function()
 
     var canvas = canvasEl.getContext("2d");
     var trees = []; // this should change to an array of all drawable (has Position and Dimension) entities?
-    
-    //trees.push(makeTree(0,0,1000,1000,1000,1000, false));
-    //trees.push(makeTree(2000,0,4000,1000,1000,1000));
-    //trees.push(makeTree(-1500,0,2000,1000,1000,1000));
-    //trees.push(makeTree(-3000,0,-1500,1000,1000,1000));
-    //trees.push(makeTree(5000,0,8000,1000,1000,1000));
-    //trees.push(makeTree(-5000,0,6000,1000,1000,1000));
 
-    for(var i=0; i < 20; i++)
+    //trees.push(makeSimpleParticle(100,100,1000,1000,1000,1000, false));
+
+    for(var i=0; i < 25; i++)
     {
-        var areaW = 6000;
-        var areaH = 6000;
-        var areaD = 6000;
+        var areaW = 10000;
+        var areaH = 10000;
+        var areaD = 10000;
 
         var treeBaseW = 1000;
         var treeBaseH = 1000;
@@ -172,6 +167,15 @@ window.onload = function()
         return JD.GameObjects.Tree.create(pos, dim, hasAudio);
     }
 
+    function makeSimpleParticle(x, y, z, w, h, d, hasAudio)
+    {
+        var pPos = JD.EntityState.Position.create(x, y, z);
+        var pDim = JD.EntityState.Dimension.create(w,h,0);
+        var pColor = JD.EntityState.Color.create(255, 128, 128, 1.0);
+
+        return JD.GameObjects.SingleParticle.create(pPos, pDim, pColor);
+    }
+
     function makeBox(name, x,y,z, w,h,d, isWanderer, isWindDrift, isExpander, isLeft, isWASD, attachCollide)
     {
         //var box = JD.Core.Component.create(name);
@@ -216,6 +220,15 @@ window.onload = function()
 
         JD.Core.ParticleBuffer.particles.sort(compareZ);
 
+        var halfScreenWidth = screenW / 2;
+        var fourthScreenWidth = halfScreenWidth / 4;
+        var threeFourthScreenWidth = halfScreenWidth + fourthScreenWidth;
+        var centerDepth = -6000;
+        var centerFalloff = 3000;
+
+        var centerUpperBound = centerDepth - centerFalloff;
+        var centerLowerBound = centerDepth + centerFalloff;
+
 		for (var i = 0; i < JD.Core.ParticleBuffer.particles.length; i++)
 		{
 			var obj = JD.Core.ParticleBuffer.particles[i];
@@ -227,16 +240,28 @@ window.onload = function()
             
             var render = camera.get3DPosition(obj);
 
-            // TODO: this alpha isn't working yet
-
-            // alpha fades to 0 as it approaches the camera within 700 z
-            //var alphaFactor = ((render.viewZ) / 700);
-            
-            //if (alphaFactor < 0.99)
+            // the viewZ is more negative as the object is further away from the camera
+            //var viewLimit = -1500;
+            //if (render.viewZ > viewLimit && render.viewZ <= 0)
             //{
-	            //alphaFactor = alphaFactor * alphaFactor;
-	            //alpha = alpha * alphaFactor;// + 1;
+                //var alphaFactor = render.viewZ / viewLimit;
+
+                //alpha = alpha * alphaFactor;
             //}
+
+            // now fade out particles in the line of sight to the character in the center
+
+            if (render.viewZ > centerUpperBound)// || render.viewZ < centerLowerBound)
+            {
+                var centerMod = Math.abs(render.viewZ - (centerDepth)) / centerFalloff;
+
+                //if (render.imgLeft > fourthScreenWidth && render.imgLeft < threeFourthScreenWidth)
+                //{
+                    var leftRightMod = Math.abs(halfScreenWidth - render.imgLeft) / halfScreenWidth;
+                    alpha = alpha * Math.max(leftRightMod,centerMod);
+                alpha *= alpha;
+                //}
+            }
 
             canvas.fillStyle = 'rgba(' + color.r + ',' + color.g + ',' + color.b + ', ' + alpha + ')';
             

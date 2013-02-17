@@ -11,7 +11,8 @@ JD.Behaviors.WASD = JD.Core.Component.extend(null, {
     
     tickAction: {
         value: function(delta) {
-            var pos = this.parent;
+            var pos = this.parent; // Camera Position has a WASD
+            var camera = pos.parent;
         
             if (!JD.GameState.IsPaused || this.moveWhilePaused)
             {	
